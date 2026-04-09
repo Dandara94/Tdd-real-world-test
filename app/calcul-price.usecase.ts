@@ -9,7 +9,7 @@ export type Product = {
 
 export type Discount = {
   type: string;
-  value?: number; // Nouveauté : on rajoute une valeur en option pour stocker notre "10"
+  value?: number;
 };
 
 // UseCase CalculatePriceUseCase :
@@ -27,9 +27,8 @@ export class CalculatePriceUseCase {
     this.notificationService = notificationService;
   }
 
-  // Méthode principale "execute" appelée par notre test pour lancer le calcul.
-  // On ajoute le 2ème paramètre 'promotions' (avec un '?' pour qu'il soit optionnel et ne casse pas les Tests 1 et 2)
-  execute(panier: Product[], promotions?: Discount[]): number {
+  // Ajout du paramètre dateActuelle (par défaut à "maintenant")
+  execute(panier: Product[], promotions?: Discount[], dateActuelle: Date = new Date()): number {
     let prixTotal = 0;
 
     // On fait une boucle pour parcourir chaque produit du panier.
@@ -39,8 +38,8 @@ export class CalculatePriceUseCase {
       prixTotal = prixTotal + (produit.price * produit.quantity);
     }
 
-    // On délègue le calcul complexe des réductions à une méthode privée
-    prixTotal = this.appliquerPromotions(prixTotal, panier, promotions);
+    // On passe la date à la méthode de calcul des promotions
+    prixTotal = this.appliquerPromotions(prixTotal, panier, promotions, dateActuelle);
 
     // Le calcul est terminé. On appelle notre méthode pour envoyer la notification.
     this.notifier(prixTotal);
@@ -49,13 +48,11 @@ export class CalculatePriceUseCase {
     return prixTotal;
   }
 
-
-  // Méthode privée pour gérer toutes les réductions
-  private appliquerPromotions(prix: number, panier: Product[], promotions?: Discount[]): number {
-    // S'il n'y a pas de promotions, on renvoie simplement le prix de base
+  private appliquerPromotions(prix: number, panier: Product[], promotions?: Discount[], dateActuelle: Date = new Date()): number {
     if (!promotions) return prix;
 
     let nouveauPrix = prix;
+    let estBlackFridayActif = false;
 
     for (const promo of promotions) {
       switch (promo.type) {
@@ -69,21 +66,35 @@ export class CalculatePriceUseCase {
 
         case 'UN_ACHETE_UN_OFFERT':
           for (const produit of panier) {
-            const nbOfferts = Math.floor(produit.quantity / 2);
-            nouveauPrix -= nbOfferts * produit.price;
+            nouveauPrix -= Math.floor(produit.quantity / 2) * produit.price;
+          }
+          break;
+
+        case 'BLACK_FRIDAY':
+          // Définition de la période : du vendredi 28/11/2025 au lundi 01/12/2025
+          const dateDebut = new Date('2025-11-28T00:00:00');
+          const dateFin = new Date('2025-12-01T23:59:59');
+
+          if (dateActuelle >= dateDebut && dateActuelle <= dateFin) {
+            nouveauPrix = nouveauPrix * 0.5; // -50%
+            estBlackFridayActif = true;
           }
           break;
       }
     }
 
-    // Le prix ne peut pas être inférieur à zéro
+    // Si le Black Friday a été appliqué, le minimum est de 1€
+    if (estBlackFridayActif) {
+      return Math.max(1, nouveauPrix);
+    }
+
+    // Sinon le minimum classique est de 0€
     return Math.max(0, nouveauPrix);
   }
 
   // Méthode "privée"
   // Seulement la classe CalculatePriceUseCase can l'utiliser
   private notifier(prix: number) {
-    // Si on nous a bien passé un service de notification, alors on envoie le prix.
     if (this.notificationService) {
       this.notificationService.envoyer(prix);
     }
