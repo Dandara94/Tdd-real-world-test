@@ -98,4 +98,26 @@ describe('CalculatePriceUseCase', () => {
     // 20€ - 30€ = -10€, mais le système doit bloquer à 0€.
     expect(prixFinal).toBe(0);
   });
+
+  // Promotion "Un acheté = Un offert" 
+  test('doit appliquer la promotion un acheté = un offert', () => {
+    // 3 T-SHIRTS achetés à 20€. 
+    const panier: Product[] = [
+      { name: 'TSHIRT', quantity: 3, type: 'TSHIRT', price: 20 }
+    ];
+
+    const promotions = [
+      { type: 'UN_ACHETE_UN_OFFERT' }
+    ];
+
+    const useCase = new CalculatePriceUseCase();
+
+    const prixFinal = useCase.execute(panier, promotions);
+
+    // 1er T-shirt: payé (20€)
+    // 2e T-shirt: offert (0€)
+    // 3e T-shirt: payé (20€)
+    // Total = 40€ au lieu de 60€
+    expect(prixFinal).toBe(40);
+  });
 });
