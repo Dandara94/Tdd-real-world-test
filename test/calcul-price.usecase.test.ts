@@ -120,4 +120,50 @@ describe('CalculatePriceUseCase', () => {
     // Total = 40€ au lieu de 60€
     expect(prixFinal).toBe(40);
   });
+
+  // Black Friday
+  describe('Black Friday', () => {
+    test('doit appliquer une réduction de 50% pendant le week-end du Black Friday', () => {
+      const panier: Product[] = [
+        { name: 'PULL', quantity: 1, type: 'PULL', price: 100 }
+      ];
+      const promotions = [{ type: 'BLACK_FRIDAY' }];
+      const dateBlackFriday = new Date('2025-11-29T12:00:00');
+
+      const useCase = new CalculatePriceUseCase();
+
+      const prixFinal = useCase.execute(panier, promotions, dateBlackFriday);
+
+      expect(prixFinal).toBe(50);
+    });
+
+    test('ne doit pas appliquer de réduction Black Friday hors de la période', () => {
+      const panier: Product[] = [
+        { name: 'PULL', quantity: 1, type: 'PULL', price: 100 }
+      ];
+      const promotions = [{ type: 'BLACK_FRIDAY' }];
+      const dateHorsPeriode = new Date('2025-11-27T12:00:00');
+
+      const useCase = new CalculatePriceUseCase();
+
+      const prixFinal = useCase.execute(panier, promotions, dateHorsPeriode);
+
+      expect(prixFinal).toBe(100);
+    });
+
+    test('le prix final ne doit pas descendre en dessous de 1 euro pendant le Black Friday', () => {
+      const panier: Product[] = [
+        { name: 'TSHIRT', quantity: 1, type: 'TSHIRT', price: 1.5 }
+      ];
+      const promotions = [{ type: 'BLACK_FRIDAY' }];
+      const dateBlackFriday = new Date('2025-11-29T12:00:00');
+
+      const useCase = new CalculatePriceUseCase();
+
+      const prixFinal = useCase.execute(panier, promotions, dateBlackFriday);
+
+      // 1.5€ - 50% = 0.75€, mais le minimum Black Friday est 1€.
+      expect(prixFinal).toBe(1);
+    });
+  });
 });
