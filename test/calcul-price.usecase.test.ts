@@ -165,5 +165,24 @@ describe('CalculatePriceUseCase', () => {
       // 1.5€ - 50% = 0.75€, mais le minimum Black Friday est 1€.
       expect(prixFinal).toBe(1);
     });
+
+    test('doit cumuler le Black Friday avec une réduction fixe (dans le bon ordre)', () => {
+      const panier: Product[] = [
+        { name: 'PULL', quantity: 1, type: 'PULL', price: 100 }
+      ];
+      // On envoie le Black Friday EN PREMIER dans la liste pour tester le tri par priorité
+      const promotions = [
+        { type: 'BLACK_FRIDAY' },
+        { type: 'FIXED', value: 30 }
+      ];
+      const dateBlackFriday = new Date('2025-11-29T12:00:00');
+
+      const useCase = new CalculatePriceUseCase();
+      const prixFinal = useCase.execute(panier, promotions, dateBlackFriday);
+
+      // Ordre attendu : (100€ - 30€) * 0.5 = 35€
+      // Si l'ordre était mauvais (BF d'abord) : (100€ * 0.5) - 30€ = 20€
+      expect(prixFinal).toBe(35);
+    });
   });
 });
