@@ -63,6 +63,11 @@ export class CalculatePriceUseCase {
         const montantAEnlever = (nouveauPrix * promo.value) / 100;
         nouveauPrix = nouveauPrix - montantAEnlever;
       }
+      
+      if (promo.type === 'FIXED' && promo.value) {
+        // On soustrait directement le montant de la réduction
+        nouveauPrix = nouveauPrix - promo.value;
+      }
     }
     return nouveauPrix;
   }
