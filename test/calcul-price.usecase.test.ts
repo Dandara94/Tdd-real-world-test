@@ -80,4 +80,22 @@ describe('CalculatePriceUseCase', () => {
     // 100€ - 30€ = 70€.
     expect(prixFinal).toBe(70);
   });
+
+  // Le prix ne doit jamais être négatif
+  test('le prix final ne doit jamais être négatif', () => {
+    const panier: Product[] = [
+      { name: 'TSHIRT', quantity: 1, type: 'TSHIRT', price: 20 }
+    ];
+
+    const promotions = [
+      { type: 'FIXED', value: 30 } // Réduction supérieure au prix du panier
+    ];
+
+    const useCase = new CalculatePriceUseCase();
+
+    const prixFinal = useCase.execute(panier, promotions);
+
+    // 20€ - 30€ = -10€, mais le système doit bloquer à 0€.
+    expect(prixFinal).toBe(0);
+  });
 });
