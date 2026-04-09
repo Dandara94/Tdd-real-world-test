@@ -35,6 +35,11 @@ app.post("/totalPrice", (request: Request, response: Response) => {
     promotionsAAppliquer.push({ type: "UN_ACHETE_UN_OFFERT" });
   }
 
+  // Si le client tape "BLACKFRIDAY", on applique la promo spéciale week-end
+  if (codePromoEcrit === "BLACKFRIDAY") {
+    promotionsAAppliquer.push({ type: "BLACK_FRIDAY" });
+  }
+
   // On utilise le UseCase
   const useCase = new CalculatePriceUseCase();
   const prixFinal = useCase.execute(produitsDemandés, promotionsAAppliquer);

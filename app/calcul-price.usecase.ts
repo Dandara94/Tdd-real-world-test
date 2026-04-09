@@ -54,7 +54,20 @@ export class CalculatePriceUseCase {
     let nouveauPrix = prix;
     let estBlackFridayActif = false;
 
-    for (const promo of promotions) {
+    // REFACTORING : Tri par priorité 
+    // Ordre : 1. Produit | 2. Fixe/% | 3. Black Friday
+    const priorites: Record<string, number> = {
+      'UN_ACHETE_UN_OFFERT': 1,
+      'PERCENTAGE': 2,
+      'FIXED': 2,
+      'BLACK_FRIDAY': 3
+    };
+
+    const promotionsTriees = [...promotions].sort((a, b) => {
+      return (priorites[a.type] || 99) - (priorites[b.type] || 99);
+    });
+
+    for (const promo of promotionsTriees) {
       switch (promo.type) {
         case 'PERCENTAGE':
           if (promo.value) nouveauPrix -= (nouveauPrix * promo.value) / 100;
