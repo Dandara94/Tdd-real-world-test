@@ -49,7 +49,6 @@ export class CalculatePriceUseCase {
     return prixTotal;
   }
 
-  // --- Méthodes privées utiles --- //
 
   // Méthode privée pour gérer toutes les réductions
   private appliquerPromotions(prix: number, panier: Product[], promotions?: Discount[]): number {
@@ -57,32 +56,32 @@ export class CalculatePriceUseCase {
     if (!promotions) return prix;
 
     let nouveauPrix = prix;
-    
+
     for (const promo of promotions) {
-      if (promo.type === 'PERCENTAGE' && promo.value) {
-        const montantAEnlever = (nouveauPrix * promo.value) / 100;
-        nouveauPrix = nouveauPrix - montantAEnlever;
-      }
-      
-      if (promo.type === 'FIXED' && promo.value) {
-        nouveauPrix -= promo.value; // Remplace "nouveauPrix = nouveauPrix - promo.value"
-      }
-      
-      if (promo.type === 'UN_ACHETE_UN_OFFERT') {
-        for (const produit of panier) {
-          // Pour chaque paire de produits (quantité / 2), un est offert :
-          const nbProduitsOfferts = Math.floor(produit.quantity / 2);
-          nouveauPrix -= (nbProduitsOfferts * produit.price);
-        }
+      switch (promo.type) {
+        case 'PERCENTAGE':
+          if (promo.value) nouveauPrix -= (nouveauPrix * promo.value) / 100;
+          break;
+
+        case 'FIXED':
+          if (promo.value) nouveauPrix -= promo.value;
+          break;
+
+        case 'UN_ACHETE_UN_OFFERT':
+          for (const produit of panier) {
+            const nbOfferts = Math.floor(produit.quantity / 2);
+            nouveauPrix -= nbOfferts * produit.price;
+          }
+          break;
       }
     }
-    
+
     // Le prix ne peut pas être inférieur à zéro
     return Math.max(0, nouveauPrix);
   }
 
   // Méthode "privée"
-  // Seulement la classe CalculatePriceUseCase peut l'utiliser
+  // Seulement la classe CalculatePriceUseCase can l'utiliser
   private notifier(prix: number) {
     // Si on nous a bien passé un service de notification, alors on envoie le prix.
     if (this.notificationService) {

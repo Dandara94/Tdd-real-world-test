@@ -16,13 +16,23 @@ app.post("/totalPrice", (request: Request, response: Response) => {
   const promotionsAAppliquer: Discount[] = [];
 
   // Si le client a tapé "10" dans la case sur le site
-  if (codePromoEcrit === "10") {
+  if (codePromoEcrit === "DISCOUNTPERCENT10") {
     promotionsAAppliquer.push({ type: "PERCENTAGE", value: 10 });
   }
 
   // Si le client tape "30", on applique la réduction
-  if (codePromoEcrit === "30") {
+  if (codePromoEcrit === "DISCOUNTEURO30") {
     promotionsAAppliquer.push({ type: "FIXED", value: 30 });
+  }
+
+  // Si le client tape "10", on applique la réduction
+  if (codePromoEcrit === "DISCOUNTEURO10") {
+    promotionsAAppliquer.push({ type: "FIXED", value: 10 });
+  }
+
+  // Si le client tape "ONEFREEPULL", on offre un produit pour un acheté
+  if (codePromoEcrit === "ONEFREEPULL") {
+    promotionsAAppliquer.push({ type: "UN_ACHETE_UN_OFFERT" });
   }
 
   // On utilise le UseCase
