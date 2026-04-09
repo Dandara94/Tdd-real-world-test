@@ -39,4 +39,26 @@ describe('CalculatePriceUseCase', () => {
     // On interroge Vitest : "Est-ce que tu peux vérifier dans les notes de l'espion que la fonction 'envoyer' a bien reçu le chiffre 40 exactement ?"
     expect(notificationSpy.envoyer).toHaveBeenCalledWith(40);
   });
+
+  // Réduction en pourcentage
+  test('doit appliquer une réduction de 10% sur la commande', () => {
+    // On met un pull à 100€ pour faire un calcul facile.
+    const panier: Product[] = [
+      { name: 'PULL', quantity: 1, type: 'PULL', price: 100 }
+    ];
+
+    // On prépare notre code promo
+    const promotions = [
+      { type: 'PERCENTAGE', value: 10 }
+    ];
+
+    const useCase = new CalculatePriceUseCase();
+
+    // On passe le panier ET la promotion.
+    // Erreur test (Rouge)
+    const prixFinal = useCase.execute(panier, promotions);
+
+    // 100€ - 10% = 90€
+    expect(prixFinal).toBe(90);
+  });
 });
