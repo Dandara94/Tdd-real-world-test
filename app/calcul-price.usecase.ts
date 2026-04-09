@@ -40,7 +40,7 @@ export class CalculatePriceUseCase {
     }
 
     // On délègue le calcul complexe des réductions à une méthode privée
-    prixTotal = this.appliquerPromotions(prixTotal, promotions);
+    prixTotal = this.appliquerPromotions(prixTotal, panier, promotions);
 
     // Le calcul est terminé. On appelle notre méthode pour envoyer la notification.
     this.notifier(prixTotal);
@@ -52,7 +52,7 @@ export class CalculatePriceUseCase {
   // --- Méthodes privées utiles --- //
 
   // Méthode privée pour gérer toutes les réductions
-  private appliquerPromotions(prix: number, promotions?: Discount[]): number {
+  private appliquerPromotions(prix: number, panier: Product[], promotions?: Discount[]): number {
     // S'il n'y a pas de promotions, on renvoie simplement le prix de base
     if (!promotions) return prix;
 
@@ -66,6 +66,14 @@ export class CalculatePriceUseCase {
       
       if (promo.type === 'FIXED' && promo.value) {
         nouveauPrix -= promo.value; // Remplace "nouveauPrix = nouveauPrix - promo.value"
+      }
+      
+      if (promo.type === 'UN_ACHETE_UN_OFFERT') {
+        for (const produit of panier) {
+          // Pour chaque paire de produits (quantité / 2), un est offert :
+          const nbProduitsOfferts = Math.floor(produit.quantity / 2);
+          nouveauPrix -= (nbProduitsOfferts * produit.price);
+        }
       }
     }
     
