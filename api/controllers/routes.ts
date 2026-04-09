@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// route connecté au frontend
+
 app.post("/totalPrice", (request: Request, response: Response) => {
   // Le frontend envoie le panier et le nom du coupon
   const produitsDemandés = request.body.products || [];
@@ -18,6 +18,11 @@ app.post("/totalPrice", (request: Request, response: Response) => {
   // Si le client a tapé "10" dans la case sur le site
   if (codePromoEcrit === "10") {
     promotionsAAppliquer.push({ type: "PERCENTAGE", value: 10 });
+  }
+
+  // Si le client tape "30", on applique la réduction
+  if (codePromoEcrit === "30") {
+    promotionsAAppliquer.push({ type: "FIXED", value: 30 });
   }
 
   // On utilise le UseCase

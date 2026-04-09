@@ -65,8 +65,7 @@ export class CalculatePriceUseCase {
       }
       
       if (promo.type === 'FIXED' && promo.value) {
-        // On soustrait directement le montant de la réduction
-        nouveauPrix = nouveauPrix - promo.value;
+        nouveauPrix -= promo.value; // Remplace "nouveauPrix = nouveauPrix - promo.value"
       }
     }
     return nouveauPrix;
