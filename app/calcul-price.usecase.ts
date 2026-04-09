@@ -68,7 +68,9 @@ export class CalculatePriceUseCase {
         nouveauPrix -= promo.value; // Remplace "nouveauPrix = nouveauPrix - promo.value"
       }
     }
-    return nouveauPrix;
+    
+    // Le prix ne peut pas être inférieur à zéro
+    return Math.max(0, nouveauPrix);
   }
 
   // Méthode "privée"
