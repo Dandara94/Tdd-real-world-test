@@ -61,4 +61,23 @@ describe('CalculatePriceUseCase', () => {
     // 100€ - 10% = 90€
     expect(prixFinal).toBe(90);
   });
+
+  // Réduction avec un montant fixe
+  test('doit appliquer une réduction fixe de 30€ sur la commande', () => {
+    const panier: Product[] = [
+      { name: 'PULL', quantity: 1, type: 'PULL', price: 100 }
+    ];
+
+    const promotions = [
+      { type: 'FIXED', value: 30 } // On crée un type FIXED pour signifier 30€ tout pile
+    ];
+
+    const useCase = new CalculatePriceUseCase();
+
+
+    const prixFinal = useCase.execute(panier, promotions);
+
+    // 100€ - 30€ = 70€.
+    expect(prixFinal).toBe(70);
+  });
 });
