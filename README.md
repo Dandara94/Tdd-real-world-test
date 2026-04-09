@@ -42,7 +42,50 @@ Ils peuvent aussi avoir des conditions d'applications :
 
 **TLDR**:
 
-- Calculer le montant final du panier après l'application des coupons dans le back
-- Utiliser l'API dans le front
+- Calculer le montant final du panier après l'application des coupons dans le usecase `CalculatePriceUseCase`.
+- Après le calcule du prix, on envoie un event à un service de notification pour informer le client du prix final de sa commande. (il faudra aussi le tester).
 
-# BaBack-test
+# test et notation
+
+- Le but de cet exercice est de tester votre approche du TDD, pas de faire un code parfait. Nous allons donc évaluer votre code en fonction de votre approche du TDD.
+
+- L'objectifs va etre de me rendre un projet avec les tests et l'implementation de votre usecase. Je vais regarder votre projet et je vais évaluer votre approche du TDD en fonction de la qualité de vos tests, de la qualité de votre code.
+
+
+
+# Rappel sur le cycle du TDD
+
+Je rappelle que le cycle du TDD est le suivant :
+  - Écrire un test qui ne compile pas ou qui échoue pour les bonnes raisons.
+  - Faire passer le test au vert en implémentant le code minimum nécessaire.
+  - Refactoriser le code en conservant les tests au vert.
+
+
+
+## Vous devrez indiquer en commentaire toutes les étapes d’avancement de votre use case, en respectant ce format : ##
+
+// Test 1 : implémentation pour faire passer le test au vert
+// Use case : CalculatePriceUseCase { ... }
+
+// Test 1 : après refactorisation du code
+// Use case : CalculatePriceUseCase { ... }
+
+# Vous devrez procéder de cette manière pour chaque cas métier, les uns après les autres.
+
+SI vous pouvez me le faire en commit c'est mieux of course 🙂
+
+# Attentes complémentaires
+Je souhaite également que vous utilisiez les bons termes en fonction des outils de test employés pour simuler votre environnement de production dans vos tests, par exemple :
+
+mock
+spy
+stub (Oups -> StupReductionApiGateway)
+fake 
+
+Il est important d’utiliser le vocabulaire approprié selon le rôle réel de chaque doublure de test.
+
+
+# Le travail devra être réalisé individuellement. Vous devrez me transmettre un lien vers votre repository GitHub contenant votre projet.Merci de m’envoyer ce lien en message privé sur Discord.
+
+
+Et faites du mob programming pour réfléchir et travailler ensemble.
