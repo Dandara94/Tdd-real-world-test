@@ -9,6 +9,7 @@ export type Product = {
 
 export type Discount = {
   type: string;
+  value?: number; // Nouveauté : on rajoute une valeur en option pour stocker notre "10"
 };
 
 // UseCase CalculatePriceUseCase :
@@ -27,7 +28,8 @@ export class CalculatePriceUseCase {
   }
 
   // Méthode principale "execute" appelée par notre test pour lancer le calcul.
-  execute(panier: Product[]): number {
+  // On ajoute le 2ème paramètre 'promotions' (avec un '?' pour qu'il soit optionnel et ne casse pas les Tests 1 et 2)
+  execute(panier: Product[], promotions?: Discount[]): number {
     let prixTotal = 0;
 
     // On fait une boucle pour parcourir chaque produit du panier.
@@ -37,11 +39,32 @@ export class CalculatePriceUseCase {
       prixTotal = prixTotal + (produit.price * produit.quantity);
     }
 
+    // On délègue le calcul complexe des réductions à une méthode privée
+    prixTotal = this.appliquerPromotions(prixTotal, promotions);
+
     // Le calcul est terminé. On appelle notre méthode pour envoyer la notification.
     this.notifier(prixTotal);
 
     // On renvoie le prix final pour que le test "expect(prixFinal).toBe(...)" puisse faire sa vérification.
     return prixTotal;
+  }
+
+  // --- Méthodes privées utiles --- //
+
+  // Méthode privée pour gérer toutes les réductions
+  private appliquerPromotions(prix: number, promotions?: Discount[]): number {
+    // S'il n'y a pas de promotions, on renvoie simplement le prix de base
+    if (!promotions) return prix;
+
+    let nouveauPrix = prix;
+    
+    for (const promo of promotions) {
+      if (promo.type === 'PERCENTAGE' && promo.value) {
+        const montantAEnlever = (nouveauPrix * promo.value) / 100;
+        nouveauPrix = nouveauPrix - montantAEnlever;
+      }
+    }
+    return nouveauPrix;
   }
 
   // Méthode "privée"
